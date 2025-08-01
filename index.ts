@@ -75,61 +75,33 @@ console.log(`Кількість треків: ${bandWithFewestTracks.trackCount}
 
 //10
 
-const longTracks = [];
+const longTracks = bands
+  .flatMap(band => band.albums || [])
+  .flatMap(album => album.tracks || [])
+  .filter(track => track && track.durationInSeconds > 300);
 
-bands.forEach(band => {
-  if (!band.albums) return; 
-
-  band.albums.forEach(album => {
-    if (!album.tracks) return; 
-
-    album.tracks.forEach(track => {
-      if (track && track.durationInSeconds > 300) {
-        longTracks.push(track);
-      }
-    });
-  });
-});
-
-console.log("Пісні які більше 300 секунд: ",longTracks);
+console.log('Пісні тривалістю більше 300 секунд:', longTracks);
 
 //11
 
-const longTracksInMinutes = bands.flatMap(band => (band.albums ?? [])
-      .flatMap(album => (album.tracks ?? [])
-      .filter(track => track && track.durationInSeconds > 300 && track.title)
-      .map(track => ({
-        title: track.title!,
-        duration: +(track.durationInSeconds / 60).toFixed(2)
-      }))
-  )
-);
+const longTrackTitles = bands
+  .flatMap(band => band.albums ?? [])
+  .flatMap(album => album.tracks ?? [])
+  .filter(track => track?.title && track.durationInSeconds! > 180)
+  .map(track => track.title as string);
 
-console.log('Пісні які більше 3 хвилин', longTracksInMinutes);
+console.log("Назви треків з тривалістю більше 3 хвилин", longTrackTitles);
+
+
 
 //12
 
-const tracksAfter1991: { 
-    title: string;
-    releaseYear: number;
-    duration: number | null }[] = [];
+const tracksAfter1991 = bands
+  .flatMap(band => band.albums || [])
+  .flatMap(album => album.tracks || [])
+  .filter(track => track && track.releaseYear > 1991 && track.title);
 
-bands.flatMap(band => {
-  (band.albums ?? []).flatMap(album => { 
-    (album.tracks ?? []).filter(track => {
-      if (track && track.releaseYear !== null && track.releaseYear > 1991) {
-        tracksAfter1991.push({
-          title: track.title!,
-          releaseYear: track.releaseYear!,
-          duration: track.durationInSeconds ?? null,
-        });
-      }
-      return false; 
-    });
-  });
-});
-
-console.log('Треки, дата створення яких після 1991 року:', tracksAfter1991);
+console.log('Треки після 1991 року:', tracksAfter1991);
 
 //13
 
